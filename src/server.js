@@ -8,29 +8,27 @@ const Server = async () => {
     const items = await excelFile.ReadExcel(workbook);
     const {browser, header} = await scraping.SetupScraper();
 
+    console.log('starting scraping');
     let scrapingResult = [];
-    console.log('start scraping');
-    for (const item of items) {
-        const index = items.indexOf(item);
-        const {cell, message} = await scraping.NewScraper(item, browser, header);
-        scrapingResult.push({cell, message});
-
-        if (index === items.length - 1) {
-            browser.pages().then((pages) => {
-                pages.forEach((page) => {
-                    page.close();
-                });
-            })
-        }
+    const parallelScraping = async (items, browser, header) => {
+        const scrapingPromises = items.map(async item => {
+            return await scraping.NewScraper(item, browser, header);
+        });
+        return await Promise.all(scrapingPromises);
     }
+    scrapingResult = await parallelScraping(items, browser, header);
 
-    console.log(scrapingResult);
+    browser.pages().then((pages) => {
+        pages.forEach((page) => {
+            page.close();
+        });
+    });
+
     await excelFile.WriteExcel({workbook, scrapingResult});
-
     console.log('done scraping');
 }
 
 Server().then(() => {
-    console.log('server is running');
+    return process.exit(0);
 });
 

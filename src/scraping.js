@@ -2,7 +2,7 @@ const randomUseragent = require("random-useragent");
 const puppeteer = require("puppeteer");
 const useProxy = require('puppeteer-page-proxy');
 const {PROXY} = require('./proxy');
-const NewScraper =  async function (item, browser, header) {
+const NewScraper = async function (item, browser, header) {
 
     const page = await browser.newPage();
     await useProxy(page, PROXY);
@@ -30,7 +30,7 @@ const NewScraper =  async function (item, browser, header) {
 
 const SetupScraper = async function () {
     const header = randomUseragent.getRandom((ua) => parseFloat(ua.browserVersion) >= 50);
-    const browser = await puppeteer.launch({headless: true});
+    const browser = await puppeteer.launch({headless: false});
     return {browser, header};
 }
 
