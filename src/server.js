@@ -9,7 +9,7 @@ const Server = async () => {
     const {browser, header} = await scraping.SetupScraper();
     const batchSize = 5;
 
-    console.log('starting scraping');
+    console.log('-- scraping is starting --');
     let scrapingResult = [];
 
     const parallelScraping = async (items, browser, header) => {
@@ -29,9 +29,10 @@ const Server = async () => {
             page.close();
         });
     });
+    console.log('-- scraping has done --');
 
     await excelFile.WriteExcel({workbook, scrapingResult});
-    console.log('done scraping');
+    console.log('-- process has done successfully --');
 }
 
 

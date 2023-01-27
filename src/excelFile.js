@@ -7,7 +7,7 @@ const ReadExcel = async (workbook) => {
     try {
         await workbook.xlsx.readFile(process.env.EXCEL_FILE).then(() => {
             const worksheet = workbook.getWorksheet(process.env.EXCEL_SHEET);
-            console.log('reading excel');
+            console.log(`-- reading excel file ${process.env.EXCEL_FILE} --`);
             worksheet.eachRow(function (row) {
                 if (rowCounter < batchSize) {
                     rowCounter++;
@@ -49,10 +49,10 @@ const WriteExcel = async ({workbook, scrapingResult}) => {
                 excelHash[itemsScraping.cell].value = itemsScraping.message;
             });
             currentIndex += batchSize;
-            console.log('writing to excel');
         }
+        console.log(`-- writing in excel file ${process.env.EXCEL_FILE} --`);
         await workbook.xlsx.writeFile(process.env.EXCEL_FILE);
-        console.log('file saved');
+        console.log('-- file has been saved successfully --');
     } catch (err) {
         console.log(err);
     }
