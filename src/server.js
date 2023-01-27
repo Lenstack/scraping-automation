@@ -7,16 +7,22 @@ const Server = async () => {
     const workbook = await excelFile.SetupExcel();
     const items = await excelFile.ReadExcel(workbook);
     const {browser, header} = await scraping.SetupScraper();
+    const batchSize = 5;
 
     console.log('starting scraping');
     let scrapingResult = [];
+
     const parallelScraping = async (items, browser, header) => {
         const scrapingPromises = items.map(async item => {
             return await scraping.NewScraper(item, browser, header);
         });
         return await Promise.all(scrapingPromises);
     }
-    scrapingResult = await parallelScraping(items, browser, header);
+
+    for (let i = 0; i < items.length; i += batchSize) {
+        const subArray = items.slice(i, i + batchSize);
+        scrapingResult = scrapingResult.concat(await parallelScraping(subArray, browser, header));
+    }
 
     browser.pages().then((pages) => {
         pages.forEach((page) => {
@@ -27,6 +33,7 @@ const Server = async () => {
     await excelFile.WriteExcel({workbook, scrapingResult});
     console.log('done scraping');
 }
+
 
 Server().then(() => {
     return process.exit(0);
